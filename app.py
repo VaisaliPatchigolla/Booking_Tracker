@@ -1,4 +1,3 @@
-# Helper: Check if any user exists
 def user_exists():
     conn = get_db()
     c = conn.cursor()
@@ -14,61 +13,17 @@ from datetime import datetime
 import json
 
 from database import get_db, init_db
+from auth import signup, login, logout
 
 
 app = Flask(__name__, static_folder='static', static_url_path='/static', template_folder='templates')
-app.secret_key = 'your_secret_key_here'  # Change this to a secure random key in production
+app.secret_key = 'your_secret_key_here'
 CORS(app)
-# Serve Pages
-@app.route('/signup', methods=['GET', 'POST'])
-def signup():
-    # Allow signup for multiple users (do not redirect if user exists)
-    if request.method == 'POST':
-        username = request.form['username']
-        email = request.form['email']
-        password = request.form['password']
-        conn = get_db()
-        c = conn.cursor()
-        # Check if user exists
-        c.execute('SELECT id FROM users WHERE username = ? OR email = ?', (username, email))
-        if c.fetchone():
-            conn.close()
-            flash('Username or email already exists.', 'error')
-            return render_template('signup.html')
-        # Insert new user
-        c.execute('INSERT INTO users (username, email, password) VALUES (?, ?, ?)', (username, email, password))
-        conn.commit()
-        conn.close()
-        flash('Signup successful! Please log in.', 'success')
-        return redirect(url_for('login'))
-    return render_template('signup.html')
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        conn = get_db()
-        c = conn.cursor()
-        c.execute('SELECT * FROM users WHERE (username = ? OR email = ?) AND password = ?', (username, username, password))
-        user = c.fetchone()
-        conn.close()
-        if user:
-            session['user_id'] = user['id']
-            session['username'] = user['username']
-            flash('Login successful!', 'success')
-            return redirect(url_for('serve_home'))
-        else:
-            flash('Username or password is wrong.', 'error')
-            return render_template('login.html')
-    # Only render the login page without error on GET
-    return render_template('login.html')
-
-@app.route('/logout')
-def logout():
-    session.clear()
-    flash('Logged out successfully.', 'success')
-    return redirect(url_for('login'))
+# Register auth routes
+app.add_url_rule('/signup', 'signup', signup, methods=['GET','POST'])
+app.add_url_rule('/login', 'login', login, methods=['GET','POST'])
+app.add_url_rule('/logout', 'logout', logout)
 
 
 from functools import wraps
@@ -77,15 +32,20 @@ from functools import wraps
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        # If no user exists, force signup
+
         if not user_exists():
             return redirect(url_for('signup'))
+
         if 'user_id' not in session:
             return redirect(url_for('login'))
+
         return f(*args, **kwargs)
+
     return decorated_function
 
-# Serve Pages
+
+# ---------------- PAGE ROUTES ----------------
+
 @app.route('/')
 @login_required
 def serve_home():
@@ -117,10 +77,47 @@ def get_travels():
     conn = get_db()
     c = conn.cursor()
 
-    c.execute("SELECT * FROM travels ORDER BY travel_date ASC")
+    # Get filters from frontend
+    search = request.args.get("search")
+    status = request.args.get("status")
+    sort = request.args.get("sort")
+
+    # Accept both snake_case and camelCase query params for compatibility
+    from_location = request.args.get("from_location") or request.args.get("fromLocation")
+    to_location = request.args.get("to_location") or request.args.get("toLocation")
+
+    query = "SELECT * FROM travels WHERE 1=1"
+    params = []
+
+    # From Location filter
+    if from_location:
+        query += " AND from_location = ?"
+        params.append(from_location)
+
+    # To Location filter
+    if to_location:
+        query += " AND to_location = ?"
+        params.append(to_location)
+
+    # Search filter
+    if search:
+        query += " AND (from_location LIKE ? OR to_location LIKE ? OR notes LIKE ?)"
+        params.extend([f"%{search}%", f"%{search}%", f"%{search}%"])
+
+    # Status filter
+    if status and status != "all":
+        query += " AND status = ?"
+        params.append(status)
+
+    # Sorting
+    if sort == "budget":
+        query += " ORDER BY budget DESC"
+    else:
+        query += " ORDER BY travel_date ASC"
+
+    c.execute(query, params)
 
     travels = [dict(row) for row in c.fetchall()]
-
     conn.close()
 
     return jsonify(travels)
@@ -291,5 +288,4 @@ def internal_error(error):
 
 if __name__ == "__main__":
     init_db()
-    #app.run(debug=True, host="172.16.17.138", port=5000)
     app.run(debug=True)
