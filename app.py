@@ -1,27 +1,105 @@
+# Helper: Check if any user exists
+def user_exists():
+    conn = get_db()
+    c = conn.cursor()
+    c.execute('SELECT id FROM users LIMIT 1')
+    exists = c.fetchone() is not None
+    conn.close()
+    return exists
 
-from flask import Flask, jsonify, request, send_from_directory
+
+from flask import Flask, jsonify, request, send_from_directory, render_template, redirect, url_for, session, flash
 from flask_cors import CORS
 from datetime import datetime
 import json
 
 from database import get_db, init_db
 
-app = Flask(__name__, static_folder='static', static_url_path='/static', template_folder='templates')
-CORS(app)
 
+app = Flask(__name__, static_folder='static', static_url_path='/static', template_folder='templates')
+app.secret_key = 'your_secret_key_here'  # Change this to a secure random key in production
+CORS(app)
+# Serve Pages
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    # Allow signup for multiple users (do not redirect if user exists)
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+        conn = get_db()
+        c = conn.cursor()
+        # Check if user exists
+        c.execute('SELECT id FROM users WHERE username = ? OR email = ?', (username, email))
+        if c.fetchone():
+            conn.close()
+            flash('Username or email already exists.', 'error')
+            return render_template('signup.html')
+        # Insert new user
+        c.execute('INSERT INTO users (username, email, password) VALUES (?, ?, ?)', (username, email, password))
+        conn.commit()
+        conn.close()
+        flash('Signup successful! Please log in.', 'success')
+        return redirect(url_for('login'))
+    return render_template('signup.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        conn = get_db()
+        c = conn.cursor()
+        c.execute('SELECT * FROM users WHERE (username = ? OR email = ?) AND password = ?', (username, username, password))
+        user = c.fetchone()
+        conn.close()
+        if user:
+            session['user_id'] = user['id']
+            session['username'] = user['username']
+            flash('Login successful!', 'success')
+            return redirect(url_for('serve_home'))
+        else:
+            flash('Username or password is wrong.', 'error')
+            return render_template('login.html')
+    # Only render the login page without error on GET
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash('Logged out successfully.', 'success')
+    return redirect(url_for('login'))
+
+
+from functools import wraps
+
+# Login required decorator
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # If no user exists, force signup
+        if not user_exists():
+            return redirect(url_for('signup'))
+        if 'user_id' not in session:
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
 
 # Serve Pages
 @app.route('/')
+@login_required
 def serve_home():
     return send_from_directory('templates', 'dashboard.html')
 
 
 @app.route('/add')
+@login_required
 def serve_add():
     return send_from_directory('templates', 'index.html')
 
 
 @app.route('/edit/<int:travel_id>')
+@login_required
 def serve_edit(travel_id):
     return send_from_directory('templates', 'edit.html')
 
