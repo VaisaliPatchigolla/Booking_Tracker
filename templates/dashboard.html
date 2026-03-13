@@ -30,46 +30,41 @@
             </div>
         </div>
 
-        <!-- Filters Section -->
-        <div class="filter-section">
-            <div class="filter-group">
-                <label for="status-filter">Status</label>
-                <select id="status-filter">
-                    <option value="">All Status</option>
-                    <option value="upcoming">Upcoming</option>
-                    <option value="ongoing">Ongoing</option>
-                    <option value="completed">Completed</option>
-                </select>
-            </div>
-
-            <div class="filter-group">
-                <label for="sort-by">Sort By</label>
-                <select id="sort-by">
-                    <option value="travel-date">Travel Date</option>
-                    <option value="from-location">From Location</option>
-                    <option value="to-location">To Location</option>
-                    <option value="budget">Budget</option>
-                    <option value="created_at">Recently Added</option>
-                </select>
-            </div>
-
-            <div class="filter-group">
-                <label for="sort-order">Order</label>
-                <select id="sort-order">
-                    <option value="ASC">Ascending</option>
-                    <option value="DESC">Descending</option>
-                </select>
-            </div>
-
-            <div class="filter-group">
-                <label for="search-input">Search</label>
-                <input type="text" id="search-input" placeholder="Search destination or notes...">
-            </div>
-
-            <button id="search-btn" class="btn btn-primary">🔍 Search</button>
-            <button id="reset-filters" class="btn btn-secondary">Reset</button>
-            <a href="/add" class="btn btn-success" style="text-decoration: none;">+ Add Travel</a>
-        </div>
+                <!-- Travel Management Panel (Updated Filter Section) -->
+                <div class="travel-panel-container">
+                    <h2 class="travel-panel-title">Travel Management Panel</h2>
+                    <div class="travel-panel-filters">
+                        <div class="travel-panel-row">
+                            <div class="travel-panel-group">
+                                <label for="status-filter">Status</label>
+                                <select id="status-filter" class="travel-panel-input">
+                                    <option value="">All Status</option>
+                                    <option value="upcoming">Upcoming</option>
+                                    <option value="ongoing">Ongoing</option>
+                                    <option value="completed">Completed</option>
+                                </select>
+                            </div>
+                            <div class="travel-panel-group">
+                                <label for="sort-by">Sort By</label>
+                                <select id="sort-by" class="travel-panel-input">
+                                    <option value="travel-date">Travel Date</option>
+                                    <option value="from-location">From Location</option>
+                                    <option value="to-location">To Location</option>
+                                    <option value="budget">Budget</option>
+                                    <option value="created_at">Recently Added</option>
+                                </select>
+                            </div>
+                            <div class="travel-panel-group search-group">
+                                <label for="search-input">Search</label>
+                                <input type="text" id="search-input" class="travel-panel-input" placeholder="Search destination or notes...">
+                            </div>
+                            <div class="travel-panel-group button-group">
+                                <button id="search-btn" class="travel-panel-btn search-btn"><span class="icon">🔍</span> Search</button>
+                                <button id="reset-filters" class="travel-panel-btn reset-btn" type="button">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
         <!-- Travels Container -->
         <div id="travels-container" class="travels-container">
