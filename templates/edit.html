@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Travel - Travel Tracker</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="/" class="logo">✈️ Travel Tracker</a>
+            <ul class="nav-links">
+                <li><a href="/">Dashboard</a></li>
+                <li><a href="/add">Add Travel</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div id="message-container"></div>
+
+    <main>
+        <h1 class="page-title">Edit Your Travel</h1>
+        
+        <div class="form-container">
+            <form id="edit-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="from-location">From Location *</label>
+                        <input type="text" id="from-location" name="from-location" placeholder="e.g., New York, USA" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="to-location">To Location *</label>
+                        <input type="text" id="to-location" name="to-location" placeholder="e.g., Paris, France" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="travel-date">Travel Date *</label>
+                    <input type="date" id="travel-date" name="travel-date" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="number-of-persons">Number of Persons Traveling *</label>
+                    <input type="number" id="number-of-persons" name="number-of-persons" placeholder="e.g., 2" min="1" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Names of Persons Traveling *</label>
+                    <div id="person-names-container">
+                        <!-- Dynamic person name fields will be generated here -->
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary">Update Travel ✈️</button>
+                    <button type="button" id="delete-btn" class="btn btn-danger">Delete</button>
+                    <a href="/" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script src="/static/js/script.js"></script>
+</body>
+</html>

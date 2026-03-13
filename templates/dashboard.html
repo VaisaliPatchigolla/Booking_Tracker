@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Travel Tracker</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="/" class="logo">✈️ Travel Tracker</a>
+            <ul class="nav-links">
+                <li><a href="/">Dashboard</a></li>
+                <li><a href="/add">Add Travel</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div id="message-container"></div>
+
+    <main>
+        <h1 class="page-title">My Travel Adventures</h1>
+
+        <!-- Statistics Dashboard -->
+        <div class="stats-grid" id="stats-container">
+            <div class="stat-card">
+                <div class="stat-label">Loading...</div>
+                <div class="stat-value">-</div>
+            </div>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="filter-section">
+            <div class="filter-group">
+                <label for="status-filter">Status</label>
+                <select id="status-filter">
+                    <option value="">All Status</option>
+                    <option value="upcoming">Upcoming</option>
+                    <option value="ongoing">Ongoing</option>
+                    <option value="completed">Completed</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="sort-by">Sort By</label>
+                <select id="sort-by">
+                    <option value="travel-date">Travel Date</option>
+                    <option value="from-location">From Location</option>
+                    <option value="to-location">To Location</option>
+                    <option value="budget">Budget</option>
+                    <option value="created_at">Recently Added</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="sort-order">Order</label>
+                <select id="sort-order">
+                    <option value="ASC">Ascending</option>
+                    <option value="DESC">Descending</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="search-input">Search</label>
+                <input type="text" id="search-input" placeholder="Search destination or notes...">
+            </div>
+
+            <button id="search-btn" class="btn btn-primary">🔍 Search</button>
+            <button id="reset-filters" class="btn btn-secondary">Reset</button>
+            <a href="/add" class="btn btn-success" style="text-decoration: none;">+ Add Travel</a>
+        </div>
+
+        <!-- Travels Container -->
+        <div id="travels-container" class="travels-container">
+            <div class="empty-state">
+                <div class="empty-state-icon">⏳</div>
+                <h3>Loading trips...</h3>
+            </div>
+        </div>
+    </main>
+
+    <script src="/static/js/script.js"></script>
+</body>
+</html>
