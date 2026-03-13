@@ -4,10 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up - Travel Tracker</title>
-    <link rel="stylesheet" href="/static/css/signp.css">
+    <link rel="stylesheet" href="/static/css/signup.css">
 </head>
 <body>
-    <body style="background: linear-gradient(135deg, #6e8efb 0%, #a777e3 100%); min-height: 100vh;">
         <div class="login-card">
                 {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
@@ -44,7 +43,6 @@
         <div class="signup-link">
             Already have an account? <a href="/login">Log In</a>
         </div>
-    </div>
-    </body>
+</div>
 </body>
 </html>
