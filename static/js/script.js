@@ -72,8 +72,8 @@ async function loadStats() {
                     <div class="stat-value">${stats.total_trips}</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-label">Total Budget</div>
-                    <div class="stat-value">$${stats.total_budget.toFixed(2)}</div>
+                    <div class="stat-label">Total Expense Spent / Budget</div>
+                    <div class="stat-value">₹${stats.total_budget.toFixed(2)}</div>
                 </div>
             `;
         }
@@ -152,8 +152,8 @@ function createTravelCard(travel) {
                     <span class="info-value">${travel.number_of_persons}</span>
                 </div>
                 ${travel.budget > 0 ? `<div class="info-item">
-                    <span class="info-label">💰 Budget:</span>
-                    <span class="info-value">$${travel.budget.toFixed(2)}</span>
+                    <span class="info-label">💰 Expense Spent / Budget:</span>
+                    <span class="info-value">₹${travel.budget.toFixed(2)}</span>
                 </div>` : ''}
             </div>
             <div class="travel-names">
@@ -378,6 +378,7 @@ async function initEditForm(travelId) {
         document.getElementById('to-location').value = travel.to_location;
         document.getElementById('travel-date').value = travel.travel_date;
         document.getElementById('number-of-persons').value = travel.number_of_persons;
+        document.getElementById('budget').value = travel.budget || 0;
         
         // Generate person name fields and populate them
         generatePersonNameFields();
@@ -428,6 +429,7 @@ async function updateTravel(travelId) {
         const toLocation = document.getElementById('to-location').value.trim();
         const travelDate = document.getElementById('travel-date').value;
         const numberOfPersons = parseInt(document.getElementById('number-of-persons').value);
+        const budget = parseFloat(document.getElementById('budget').value) || 0;
         const status = calculateStatus(travelDate);
         
         // Get person names
@@ -463,6 +465,7 @@ async function updateTravel(travelId) {
                 travel_date: travelDate,
                 number_of_persons: numberOfPersons,
                 person_names: personNames,
+                budget: budget,
                 status: status
             })
         });
