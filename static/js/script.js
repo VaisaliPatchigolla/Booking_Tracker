@@ -1,6 +1,22 @@
 // API Base URL
 const API_BASE = '/api';
 
+// Determine travel status based on travel date vs today
+function calculateStatus(travelDateStr) {
+    const travelDate = new Date(travelDateStr);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    travelDate.setHours(0, 0, 0, 0);
+
+    if (travelDate > today) {
+        return 'upcoming';
+    }
+    if (travelDate.getTime() === today.getTime()) {
+        return 'ongoing';
+    }
+    return 'completed';
+}
+
 // Initialize app on document load
 document.addEventListener('DOMContentLoaded', () => {
     // Determine current page and initialize accordingly
@@ -125,7 +141,7 @@ function createTravelCard(travel) {
         <div class="travel-card">
             <div class="travel-card-header">
                 <div class="travel-destination">${escapeHtml(travel.from_location)} → ${escapeHtml(travel.to_location)}</div>
-                <span class="travel-status status-${travel.status}">${travel.status}</span>
+                <span class="travel-status status-${travel.status}">${escapeHtml(formatStatus(travel.status))}</span>
             </div>
             <div class="travel-dates">
                 📅 ${formatDate(travel.travel_date)}
@@ -244,6 +260,8 @@ function initAddForm() {
     const numPersonsField = document.getElementById('number-of-persons');
     if (numPersonsField) {
         numPersonsField.addEventListener('input', generatePersonNameFields);
+        // Ensure a person name field is shown for the default value
+        generatePersonNameFields();
     }
 }
 
@@ -279,7 +297,7 @@ async function addTravel() {
         const travelDate = document.getElementById('travel-date').value;
         const numberOfPersons = parseInt(document.getElementById('number-of-persons').value);
         const budget = parseFloat(document.getElementById('budget').value) || 0;
-        const status = document.getElementById('status').value;
+        const status = calculateStatus(travelDate);
         const notes = document.getElementById('notes').value.trim();
         
         // Get person names
@@ -410,6 +428,7 @@ async function updateTravel(travelId) {
         const toLocation = document.getElementById('to-location').value.trim();
         const travelDate = document.getElementById('travel-date').value;
         const numberOfPersons = parseInt(document.getElementById('number-of-persons').value);
+        const status = calculateStatus(travelDate);
         
         // Get person names
         const personNames = [];
@@ -443,7 +462,8 @@ async function updateTravel(travelId) {
                 to_location: toLocation,
                 travel_date: travelDate,
                 number_of_persons: numberOfPersons,
-                person_names: personNames
+                person_names: personNames,
+                status: status
             })
         });
         
@@ -490,6 +510,12 @@ async function deleteTravel(travelId) {
 }
 
 // Utility Functions
+
+// Format status label
+function formatStatus(status) {
+    if (!status) return '';
+    return status.toString().charAt(0).toUpperCase() + status.toString().slice(1);
+}
 
 // Format date
 function formatDate(dateStr) {
